@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-:root {
+/* :root {
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -23,4 +23,33 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+} */
+
+/* global.css */
+/* Light mode styles */
+:root {
+  --primary-color: #007bff;
+  --background-color: #fff;
+  --text-color: #333;
+}
+
+/* Dark mode styles */
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #007bff;
+    --background-color: #121212;
+    --text-color: #fff;
+  }
+}
+ */
+
+/* Apply styles to elements */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.button {
+  background-color: var(--primary-color);
+  color: #fff;
 }
