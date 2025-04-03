@@ -81,10 +81,12 @@ const RULES: RuleConfig[] = [
 
 const OfferEligibility: React.FC = () => {
   const [rules, setRules] = useState<Rule[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   // Adding rule with empty values, as we do not know the type, value and its operator
   const addRule = () => {
     setRules([...rules, { type: "", operator: "", value: "" }]);
+    setError(null);
   };
 
   // Do not allow adding the same rule multiple times, as we are having AND operator between rule, so adding same
@@ -118,9 +120,9 @@ const OfferEligibility: React.FC = () => {
     ) {
       const [startValue, endValue] = updatedRules[index][field];
       if (valueIndex && startValue >= value) {
-        console.error("Please select a correct value");
+        setError("Please select a correct value");
       } else if (!valueIndex && endValue <= value) {
-        console.error("Please select a correct value");
+        setError("Please select a correct value");
       } else {
         (updatedRules[index][field] as string[])[valueIndex] = value;
       }
@@ -168,6 +170,7 @@ const OfferEligibility: React.FC = () => {
       (v) => v != value
     );
     setRules(updatedRules);
+    setError(null);
   };
 
   // Not working as expected
@@ -188,8 +191,10 @@ const OfferEligibility: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-100 rounded-lg shadow-md max-w-3xl mx-auto">
-      <h2 className="text-lg font-semibold mb-4">Offer Eligibility Rules</h2>
-
+      <h2 className="text-lg font-semibold mb-2">Rules</h2>
+      <p className="mb-3">
+        The offer will be triggered based on the rules in this section
+      </p>
       {rules.map((rule, index) => (
         <div key={index}>
           <div className="flex items-center space-x-4 mb-3 p-3 bg-white rounded-lg shadow">
@@ -233,28 +238,31 @@ const OfferEligibility: React.FC = () => {
             )}
 
             {rangeInputOperators.includes(rule.operator) ? (
-              <>
-                <input
-                  type="text"
-                  value={rule.value[0] || ""}
-                  onChange={(e) =>
-                    updateRule(index, "value", e.target.value, 0)
-                  }
-                  className="p-2 border rounded w-32"
-                  placeholder="Value"
-                  disabled={!rule.operator}
-                />
-                <input
-                  type="text"
-                  value={rule.value[1] || ""}
-                  onChange={(e) =>
-                    updateRule(index, "value", e.target.value, 1)
-                  }
-                  className="p-2 border rounded w-32"
-                  placeholder="Value"
-                  disabled={!rule.operator}
-                />
-              </>
+              <div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={rule.value[0] || ""}
+                    onChange={(e) =>
+                      updateRule(index, "value", e.target.value, 0)
+                    }
+                    className="p-2 border rounded w-32"
+                    placeholder="Value"
+                    disabled={!rule.operator}
+                  />
+                  <input
+                    type="text"
+                    value={rule.value[1] || ""}
+                    onChange={(e) =>
+                      updateRule(index, "value", e.target.value, 1)
+                    }
+                    className="p-2 border rounded w-32"
+                    placeholder="Value"
+                    disabled={!rule.operator}
+                  />
+                </div>
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+              </div>
             ) : (
               <>
                 {getRuleInfo(rule)?.type === "select" ? (
@@ -290,33 +298,63 @@ const OfferEligibility: React.FC = () => {
 
             <button
               onClick={() => removeRule(index)}
-              className="px-3 py-1 text-white rounded hover:bg-red-100"
+              className="px-3 py-1 rounded cursor-pointer"
             >
-              ✖
+              <svg
+                className="h-4 w-4 bg-red"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6L18 18"
+                ></path>
+              </svg>
             </button>
           </div>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 mb-3">
             {Array.isArray(rule.value) &&
               rule.value.map((v, i) => (
                 <div
                   key={i}
-                  className="rounded-full bg-slate-500 py-0.5 px-2.5 text-sm text-white"
-                  // Move this click event on the cross icon
-                  onClick={() => updateRuleValue(index, v)}
+                  className="rounded-full bg-slate-500 py-0.5 px-2.5 text-sm text-white inline-flex items-center"
                 >
-                  {v}
+                  <span className="px-2">{v}</span>
+                  <span
+                    className="badge badge-primary rounded-full py-1 cursor-pointer"
+                    onClick={() => updateRuleValue(index, v)}
+                  >
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6L18 18"
+                      ></path>
+                    </svg>
+                  </span>
                 </div>
               ))}
           </div>
         </div>
       ))}
 
-      <button
-        onClick={addRule}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-      >
-        + Add Rule
-      </button>
+      <div className="flex justify-center">
+        <button
+          onClick={addRule}
+          className="mt-4 px-4 py-2 bg-white-500 border rounded hover:bg-white-700 cursor-pointer"
+        >
+          + AND
+        </button>
+      </div>
     </div>
   );
 };
